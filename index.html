@@ -4,10 +4,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
     <title>Family Group eke ayata Cricket</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        #debug-log {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+            padding: 10px;
+            background: #222;
+            color: #0f0;
+            font-family: monospace;
+            font-size: 0.8rem;
+            border-radius: 8px;
+            display: none;
+            /* Hidden by default */
+            word-break: break-all;
+        }
+    </style>
 </head>
 
 <body>
@@ -19,7 +36,7 @@
 
         <main class="player-container">
             <div class="video-wrapper">
-                <video id="video" controls autoplay playsinline></video>
+                <video id="video" controls autoplay playsinline muted></video>
 
                 <!-- Quality Selector Overlay -->
                 <div class="quality-control">
@@ -32,10 +49,13 @@
 
             <div class="message-box">
                 <p>චූටි මාමාගේ අසනීපය දුරු වේවා..!!</p>
+                <p style="font-size: 0.8rem; color: #aaa; margin-top: 5px;">(If Stream doesn't play on Mobile Data,
+                    please turn on a VPN)</p>
             </div>
 
             <div class="controls">
                 <p id="status" class="status-message">Loading Stream...</p>
+                <div id="debug-log"></div>
             </div>
         </main>
 
@@ -115,10 +135,23 @@
 
             });
 
+            var debugLog = document.getElementById('debug-log');
+            function logError(msg) {
+                debugLog.style.display = 'block';
+                debugLog.innerText += "\n[ERROR] " + msg;
+            }
+
             hls.on(Hls.Events.ERROR, function (event, data) {
                 console.log("HLS Error:", data);
+
+                if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+                    logError("Network Error: " + data.details + " (Check VPN/CORS)");
+                } else if (data.fatal) {
+                    logError("Fatal Error: " + data.type + " - " + data.details);
+                }
+
                 if (data.fatal) {
-                    statusText.innerText = "Mobile Issue? Retrying (" + data.details + ")";
+                    statusText.innerText = "Error: Mobile Carrier Blocked? Try VPN (" + data.details + ")";
                     // ... retry logic remains ...
                     switch (data.type) {
                         case Hls.ErrorTypes.NETWORK_ERROR:
@@ -147,6 +180,13 @@
             video.addEventListener('loadedmetadata', function () {
                 video.play();
                 statusText.innerText = "Enjoy the Match!";
+            });
+            video.addEventListener('error', function (e) {
+                var err = video.error;
+                var debugLog = document.getElementById('debug-log');
+                debugLog.style.display = 'block';
+                debugLog.innerText += "\n[NATIVE ERROR] " + (err ? err.message + " (" + err.code + ")" : "Unknown");
+                statusText.innerText = "Native Player Error: " + (err ? err.code : "Unknown");
             });
         }
     </script>
