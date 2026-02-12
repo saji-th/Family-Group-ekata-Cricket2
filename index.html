@@ -1,195 +1,263 @@
-<!DOCTYPE html>
-<html lang="en">
+:root {
+    --bg-color: #0d0d0d;
+    --text-color: #e0e0e0;
+    --accent-color: #ff4757;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="referrer" content="no-referrer">
-    <title>Family Group eke ayata Cricket</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <style>
-        #debug-log {
-            width: 100%;
-            max-width: 600px;
-            margin-top: 20px;
-            padding: 10px;
-            background: #222;
-            color: #0f0;
-            font-family: monospace;
-            font-size: 0.8rem;
-            border-radius: 8px;
-            display: none;
-            /* Hidden by default */
-            word-break: break-all;
-        }
-    </style>
-</head>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-<body>
-    <div class="container">
-        <header>
-            <h1>Family Group eke ayata Cricket</h1>
-            <p>Live Stream Experience</p>
-        </header>
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: #050505;
+    background-image:
+        radial-gradient(circle at 20% 30%, rgba(255, 71, 87, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(41, 128, 185, 0.15) 0%, transparent 40%),
+        linear-gradient(to bottom, #0a0a0a, #111);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+}
 
-        <main class="player-container">
-            <div class="video-wrapper">
-                <video id="video" controls autoplay playsinline muted></video>
+/* ... existing code ... */
+.container {
+    width: 100%;
+    max-width: 1400px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
 
-                <!-- Quality Selector Overlay -->
-                <div class="quality-control">
-                    <label for="quality-select">Quality:</label>
-                    <select id="quality-select">
-                        <option value="-1">Auto</option>
-                    </select>
-                </div>
-            </div>
+header {
+    text-align: center;
+    margin-bottom: 1rem;
+    animation: fadeInDown 1s ease-out;
+}
 
-            <div class="message-box">
-                <p>චූටි මාමාගේ අසනීපය දුරු වේවා..!!</p>
-                <p style="font-size: 0.8rem; color: #aaa; margin-top: 5px;">(If Stream doesn't play on Mobile Data,
-                    please turn on a VPN)</p>
-            </div>
+header h1 {
+    font-size: 3rem;
+    font-weight: 600;
+    background: linear-gradient(45deg, #fff, #aaa);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+    letter-spacing: -1px;
+}
 
-            <div class="controls">
-                <p id="status" class="status-message">Loading Stream...</p>
-                <div id="debug-log"></div>
-            </div>
-        </main>
+header p {
+    font-size: 1.1rem;
+    color: #888;
+    font-weight: 300;
+}
 
-        <footer>
-            <p>&copy; 2026 Live Stream. Premium Experience.</p>
-        </footer>
-    </div>
+.player-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    perspective: 1000px;
+}
 
-    <script>
-        var video = document.getElementById('video');
-        var qualitySelect = document.getElementById('quality-select');
-        var statusText = document.getElementById('status');
-        var videoSrc = 'https://plu001.myluck1.top:8088/live/webcricn04/playlist.m3u8?vidictid=204965757133&id=114607&pk=bdec980bd7036f2ec6113f913a209722aa7c303ec631b436540fa58acc585a3d1cfae2480de2b8d55c1c4862c845c34417bf2edd2171403f418c073361b19d42';
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 1280px;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
 
-        if (Hls.isSupported()) {
-            var config = {
-                startLevel: 0,              // Force start at lowest quality
-                autoLevelEnabled: false,    // DISABLE auto-switching
-                maxBufferLength: 30,        // Secure buffer (30s is plenty)
-                maxMaxBufferLength: 60,
-                enableWorker: true,
-                lowLatencyMode: false,
-                manifestLoadingTimeOut: 60000, // Very long timeout for mobile
-                fragLoadingTimeOut: 60000,
-                // REVERT: Standard latency to ensure segments exist
-                liveSyncDurationCount: 3,   // Standard safety (3 segments back)
-            };
-            var hls = new Hls(config);
-            hls.loadSource(videoSrc);
-            hls.attachMedia(video);
+.video-wrapper:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+    border-color: rgba(255, 255, 255, 0.2);
+}
 
-            hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
-                video.play();
-                statusText.innerText = "Optimized for Network. Playing...";
+.video-wrapper #video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Ensures the video ratio is preserved without stretching */
+    background: #000;
+    border: none;
+}
 
-                // Force lowest quality immediately
-                hls.currentLevel = 0;
-                hls.loadLevel = 0;
+/* Message Box Styling */
+.message-box {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 255, 255, 0.05));
+    border-radius: 16px;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    width: 100%;
+    max-width: 650px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
+    animation: fadeInUp 0.5s ease-out, glowPulse 3s infinite alternate;
+    backdrop-filter: blur(5px);
+}
 
-                // Populate quality levels
-                var availableLevels = hls.levels;
+.message-box p {
+    font-size: 1.3rem;
+    color: #ffda44;
+    /* Brighter gold */
+    font-family: 'Outfit', sans-serif;
+    /* Setup for Sinhala support if needed usually universal fonts work */
+    font-weight: 600;
+    line-height: 1.6;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
 
-                // Clear existing options
-                qualitySelect.innerHTML = '';
+@keyframes glowPulse {
+    from {
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.05);
+        border-color: rgba(255, 215, 0, 0.2);
+    }
 
-                availableLevels.forEach(function (level, index) {
-                    var option = document.createElement('option');
-                    option.value = index;
-                    // Use height for resolution (e.g. 360p), fallback to bitrate if height is missing
-                    var resolutionText = level.height ? level.height + 'p' : Math.round(level.bitrate / 1000) + 'kbps';
-                    // Add star to forced level
-                    if (index === 0) resolutionText += " (Stable)";
-                    option.text = resolutionText;
-                    qualitySelect.appendChild(option);
+    to {
+        box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
+        border-color: rgba(255, 215, 0, 0.5);
+    }
+}
 
-                    // Select the lowest quality by default
-                    if (index === 0) option.selected = true;
-                });
+/* Quality Control Overlay */
+.quality-control {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    padding: 5px 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 10;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
 
-                // Handle quality change
-                qualitySelect.addEventListener('change', function () {
-                    hls.currentLevel = parseInt(this.value);
-                    console.log("Quality set to level index: " + this.value);
-                });
-                // Add Fix Network Button logic
-                var fixBtn = document.createElement('button');
-                fixBtn.innerText = "⚠️ Troubleshoot Network";
-                fixBtn.className = "btn-fix"; // Add simple style later
-                fixBtn.onclick = function () {
-                    statusText.innerText = "Attempting to reset stream...";
-                    hls.stopLoad();
-                    hls.startLevel = -1; // Try unlocking Auto quality
-                    hls.startLoad();
-                    setTimeout(() => video.play(), 1000);
-                };
-                document.querySelector('.controls').appendChild(fixBtn);
+.quality-control label {
+    font-size: 0.8rem;
+    color: #ccc;
+    font-weight: 600;
+}
 
-            });
+.quality-control select {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    outline: none;
+}
 
-            var debugLog = document.getElementById('debug-log');
-            function logError(msg) {
-                debugLog.style.display = 'block';
-                debugLog.innerText += "\n[ERROR] " + msg;
-            }
+.quality-control select option {
+    background: #222;
+    color: #fff;
+}
 
-            hls.on(Hls.Events.ERROR, function (event, data) {
-                console.log("HLS Error:", data);
+/* Controls / Debug Button Styles */
+.controls {
+    text-align: center;
+    animation: fadeInUp 1s ease-out 0.3s backwards;
+}
 
-                if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-                    logError("Network Error: " + data.details + " (Check VPN/CORS)");
-                } else if (data.fatal) {
-                    logError("Fatal Error: " + data.type + " - " + data.details);
-                }
+.status-message {
+    color: #888;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
 
-                if (data.fatal) {
-                    statusText.innerText = "Error: Mobile Carrier Blocked? Try VPN (" + data.details + ")";
-                    // ... retry logic remains ...
-                    switch (data.type) {
-                        case Hls.ErrorTypes.NETWORK_ERROR:
-                            console.log("fatal network error encountered, try to recover");
-                            hls.startLoad();
-                            break;
-                        case Hls.ErrorTypes.MEDIA_ERROR:
-                            console.log("fatal media error encountered, try to recover");
-                            hls.recoverMediaError();
-                            break;
-                        default:
-                            // Try to recover even on 'fatal' errors by restarting load after delay
-                            setTimeout(function () {
-                                hls.loadSource(videoSrc);
-                                hls.startLoad();
-                            }, 5000);
-                            break;
-                    }
-                }
-            });
-        }
-        else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            // Native HLS support (Safari) doesn't support manual quality switching via JS easily
-            video.src = videoSrc;
-            qualitySelect.style.display = 'none'; // Hide selector on Safari
-            video.addEventListener('loadedmetadata', function () {
-                video.play();
-                statusText.innerText = "Enjoy the Match!";
-            });
-            video.addEventListener('error', function (e) {
-                var err = video.error;
-                var debugLog = document.getElementById('debug-log');
-                debugLog.style.display = 'block';
-                debugLog.innerText += "\n[NATIVE ERROR] " + (err ? err.message + " (" + err.code + ")" : "Unknown");
-                statusText.innerText = "Native Player Error: " + (err ? err.code : "Unknown");
-            });
-        }
-    </script>
-</body>
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 30px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
 
-</html>
+.btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: #fff;
+    transform: scale(1.05);
+}
+
+.btn-fix {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: rgba(255, 71, 87, 0.2);
+    border: 1px solid rgba(255, 71, 87, 0.5);
+    border-radius: 20px;
+    color: #ffcccb;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-fix:hover {
+    background: rgba(255, 71, 87, 0.4);
+}
+
+footer {
+    margin-top: 2rem;
+    color: #444;
+    font-size: 0.9rem;
+    animation: fadeInUp 1s ease-out 0.5s backwards;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2rem;
+    }
+}
