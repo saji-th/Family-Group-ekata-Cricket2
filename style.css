@@ -208,6 +208,23 @@ header p {
     transform: scale(1.05);
 }
 
+.btn-fix {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: rgba(255, 71, 87, 0.2);
+    border: 1px solid rgba(255, 71, 87, 0.5);
+    border-radius: 20px;
+    color: #ffcccb;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-fix:hover {
+    background: rgba(255, 71, 87, 0.4);
+}
+
 footer {
     margin-top: 2rem;
     color: #444;
