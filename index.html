@@ -54,16 +54,14 @@
             var config = {
                 startLevel: 0,              // Force start at lowest quality
                 autoLevelEnabled: false,    // DISABLE auto-switching
-                maxBufferLength: 60,        // Keep 60s buffer
-                maxMaxBufferLength: 120,
+                maxBufferLength: 30,        // Secure buffer (30s is plenty)
+                maxMaxBufferLength: 60,
                 enableWorker: true,
                 lowLatencyMode: false,
-                manifestLoadingTimeOut: 20000,
-                fragLoadingTimeOut: 20000,
-                // NEW: Increase delay to help weak connections
-                liveSyncDurationCount: 6,   // Start ~20-30s behind live (builds buffer)
-                liveMaxLatencyDurationCount: 20, // Allow falling back further without seeking
-                maxLiveSyncPlaybackRate: 1, // Never speed up to catch up (stops glitching)
+                manifestLoadingTimeOut: 60000, // Very long timeout for mobile
+                fragLoadingTimeOut: 60000,
+                // REVERT: Standard latency to ensure segments exist
+                liveSyncDurationCount: 3,   // Standard safety (3 segments back)
             };
             var hls = new Hls(config);
             hls.loadSource(videoSrc);
@@ -102,12 +100,26 @@
                     hls.currentLevel = parseInt(this.value);
                     console.log("Quality set to level index: " + this.value);
                 });
+                // Add Fix Network Button logic
+                var fixBtn = document.createElement('button');
+                fixBtn.innerText = "⚠️ Troubleshoot Network";
+                fixBtn.className = "btn-fix"; // Add simple style later
+                fixBtn.onclick = function () {
+                    statusText.innerText = "Attempting to reset stream...";
+                    hls.stopLoad();
+                    hls.startLevel = -1; // Try unlocking Auto quality
+                    hls.startLoad();
+                    setTimeout(() => video.play(), 1000);
+                };
+                document.querySelector('.controls').appendChild(fixBtn);
+
             });
 
             hls.on(Hls.Events.ERROR, function (event, data) {
                 console.log("HLS Error:", data);
                 if (data.fatal) {
-                    statusText.innerText = "Network Issue. Retrying... (" + data.details + ")";
+                    statusText.innerText = "Mobile Issue? Retrying (" + data.details + ")";
+                    // ... retry logic remains ...
                     switch (data.type) {
                         case Hls.ErrorTypes.NETWORK_ERROR:
                             console.log("fatal network error encountered, try to recover");
